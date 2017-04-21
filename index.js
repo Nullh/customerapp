@@ -1,4 +1,6 @@
 var express = require('express');
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
 var bodyParser = require('body-parser');
 var path = require('path');
 var pug = require('pug');
@@ -8,13 +10,37 @@ var db = mongojs('app:DwarfD0rf@localhost/customerapp', ['users']);
 var ObjectId = mongojs.ObjectId;
 
 var app = express();
+var store = new MongoDBStore(
+    {
+        uri: 'mongodb://app:DwarfD0rf@localhost:27017/customerapp',
+        collection: 'sessionStore'
+    }
+);
 
-var errors = null;
-var values = {first_name: null, last_name: null, email: null};
+// Catch errors 
+store.on('error', function(error) {
+    assert.ifError(error);
+    assert.ok(false);
+});
+
+// THESE NEED TO BE STORED IN A USER SESSION
+//var errors = null;
+//var values = {first_name: null, last_name: null, email: null};
 
 // View engine
 app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
+
+// Set up session
+app.use(require('express-session')({
+    secret: 'We <3 Secrets',
+    cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week 
+    },
+    store: store,
+    resave: true,
+    saveUninitialized: true
+}));
 
 // BodyParser middleware
 app.use(bodyParser.json());
@@ -46,12 +72,17 @@ app.use(expressValidator({
 
 app.get('/', function(req, res){
     // find everything
+    if(req.session.values == null)
+    {
+        req.session.values = {first_name: '', last_name: '', email: ''};
+    }
+    console.log(JSON.stringify(req.session));
     db.users.find(function (err, users) {
         res.render('index', {
         title: 'Customers',
         users: users,
-        errors: errors,
-        values: values
+        errors: req.session.errors,
+        values: req.session.values
         });
     })
 });
@@ -62,11 +93,11 @@ app.post('/users/add', function(req, res){
     req.checkBody('last_name', 'last name is required').notEmpty();
     req.checkBody('email', 'email name is required').notEmpty();
 
-    values = {first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email};
+    req.session.values = {first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email};
     
-    errors = req.validationErrors();
+    req.session.errors = req.validationErrors();
 
-    if(errors){
+    if(req.session.errors){
         res.redirect('/');
     } else {
 
@@ -84,7 +115,7 @@ app.post('/users/add', function(req, res){
             res.redirect('/');
         });
 
-        values = {first_name: null, last_name: null, email: null};
+        req.session.values = {first_name: '', last_name: '', email: ''};
     }
 });
 

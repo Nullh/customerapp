@@ -9,8 +9,8 @@ var ObjectId = mongojs.ObjectId;
 
 var app = express();
 
-var users = null;
 var errors = null;
+var values = {first_name: null, last_name: null, email: null};
 
 // View engine
 app.set('view engine', 'pug');
@@ -50,7 +50,8 @@ app.get('/', function(req, res){
         res.render('index', {
         title: 'Customers',
         users: users,
-        errors: errors
+        errors: errors,
+        values: values
         });
     })
 });
@@ -61,6 +62,8 @@ app.post('/users/add', function(req, res){
     req.checkBody('last_name', 'last name is required').notEmpty();
     req.checkBody('email', 'email name is required').notEmpty();
 
+    values = {first_name: req.body.first_name, last_name: req.body.last_name, email: req.body.email};
+    
     errors = req.validationErrors();
 
     if(errors){
@@ -80,6 +83,8 @@ app.post('/users/add', function(req, res){
 
             res.redirect('/');
         });
+
+        values = {first_name: null, last_name: null, email: null};
     }
 });
 

@@ -25,15 +25,15 @@ html
         form(method="POST" action="/users/add")
             label First Name:
             br
-            input(type="text" name="first_name")
+            input(type="text" name="first_name" value=values.first_name)
             br
             label Last Name:
             br
-            input(type="text" name="last_name")
+            input(type="text" name="last_name" value=values.last_name)
             br
             label Email:
             br
-            input(type="text" name="email")
+            input(type="text" name="email" value=values.email)
             br
             input(type="submit" value="Submit")
     include partials/footer.pug

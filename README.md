@@ -1,5 +1,5 @@
 # customerapp
-A simple node.js express/mongDB app, based on [Brad Traversy's Youtube Tutorial](https://youtu.be/gnsO8-xJ8rs).
+A simple node.js express/mongoDB app, based on [Brad Traversy's Youtube Tutorial](https://youtu.be/gnsO8-xJ8rs).
 
 To try out this app run:
 ```

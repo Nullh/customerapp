@@ -57,10 +57,10 @@ app.use(expressValidator({
 
 app.get('/', function(req, res){
     // find everything
-    db.users.find(function (err, docs) {
+    db.users.find(function (err, users) {
         res.render('index', {
         title: 'Customers',
-        users: docs
+        users: users
         });
     })
 });
@@ -74,11 +74,13 @@ app.post('/users/add', function(req, res){
     var errors = req.validationErrors();
 
     if(errors){
-        res.render('index', {
-            title: 'Customers',
-            users: users,
-            errors: errors
-        });
+        db.users.find(function (err, users) {
+            res.render('index', {
+                title: 'Customers',
+                users: users,
+                errors: errors
+            });
+        })
     } else {
 
         var newUser = {

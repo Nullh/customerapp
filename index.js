@@ -9,13 +9,8 @@ var ObjectId = mongojs.ObjectId;
 
 var app = express();
 
-/*
-var logger  = function(req, res, next){
-    console.log('logging...');
-    next();
-};
-app.use(logger);
-*/
+var users = null;
+var errors = null;
 
 // View engine
 app.set('view engine', 'pug');
@@ -28,12 +23,6 @@ app.use(bodyParser.urlencoded({extended: false}));
 // Set static path
 app.use(express.static(path.join(__dirname, 'public')));
 
-//Global vars
-app.use(function(req, res, next){
-    res.locals.errors = null;
-    res.locals.users = null;
-    next();
-})
 
 // Express validator middleware
 app.use(expressValidator({
@@ -60,7 +49,8 @@ app.get('/', function(req, res){
     db.users.find(function (err, users) {
         res.render('index', {
         title: 'Customers',
-        users: users
+        users: users,
+        errors: errors
         });
     })
 });
@@ -71,16 +61,10 @@ app.post('/users/add', function(req, res){
     req.checkBody('last_name', 'last name is required').notEmpty();
     req.checkBody('email', 'email name is required').notEmpty();
 
-    var errors = req.validationErrors();
+    errors = req.validationErrors();
 
     if(errors){
-        db.users.find(function (err, users) {
-            res.render('index', {
-                title: 'Customers',
-                users: users,
-                errors: errors
-            });
-        })
+        res.redirect('/');
     } else {
 
         var newUser = {
@@ -105,9 +89,8 @@ app.delete('/users/delete/:id', function(req, res){
         if(err){
             console.log(err);
         }
-
-        //res.redirect('/');
     });
+    res.redirect('/');
 });
 
 app.listen(3000, function(){

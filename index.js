@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var path = require('path');
+var pug = require('pug');
 var expressValidator = require('express-validator');
 var mongojs = require('mongojs');
 var db = mongojs('app:DwarfD0rf@localhost/customerapp', ['users']);
@@ -17,7 +18,7 @@ app.use(logger);
 */
 
 // View engine
-app.set('view engine', 'ejs');
+app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // BodyParser middleware
@@ -30,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 //Global vars
 app.use(function(req, res, next){
     res.locals.errors = null;
+    res.locals.users = null;
     next();
 })
 

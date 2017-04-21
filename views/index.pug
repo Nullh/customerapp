@@ -1,0 +1,39 @@
+doctype html
+html
+    include partials/header.pug
+    body
+        h1= title
+        table
+            tr
+                th First Name
+                th Last Name
+                th Email
+            each user in users
+                tr
+                    td= user.first_name
+                    td= user.last_name
+                    td= user.email
+                    td 
+                        a(href="#" class = "deleteUser" data-id=user._id) Delete
+        br
+        hr
+        h3 Add Customer
+        if errors
+            ul
+                each error in errors
+                    li= error.msg
+        form(method="POST" action="/users/add")
+            label First Name:
+            br
+            input(type="text" name="first_name")
+            br
+            label Last Name:
+            br
+            input(type="text" name="last_name")
+            br
+            label Email:
+            br
+            input(type="text" name="email")
+            br
+            input(type="submit" value="Submit")
+    include partials/footer.pug

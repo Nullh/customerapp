@@ -1,0 +1,36 @@
+<% include partials/header %>
+
+    <h1><%= title %></h1>
+    <table border=0>
+        <col width = "120" /><col width = "120" /><col width = "200" />
+        <tr><th align=left>First Name</th><th align=left>Last Name</th><th align=left>Email</th></tr>
+        <% users.forEach(function(user){ %>
+            <td><%= user.first_name %></td><td><%= user.last_name %></td><td><%= user.email %></td><td><a href="#" class = "deleteUser" data-id="<%= user._id %>">Delete</a></td></tr>
+        <% }) %>
+    </table>
+    <br /><hr />
+    <h1>Add customer</h1>
+    <% if(errors){ %>
+    <ul>
+        <% errors.forEach(function(error){ %>
+        <li><%= error.msg %></li>
+        <% }) %>
+    </ul>
+    <% } %>
+    <form method="POST" action="/users/add">
+        <label>First name: </label>
+        <br />
+        <input type="text" name="first_name" />
+        <br />
+        <label>Last name: </label>
+        <br />
+        <input type="text" name="last_name" />
+        <br />
+        <label>Email: </label>
+        <br />
+        <input type="email" name="email" />
+        <br />
+        <br />
+        <input type="submit" value="Submit" />
+    </form>
+<% include partials/footer %>

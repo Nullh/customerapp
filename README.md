@@ -1,5 +1,5 @@
 # customerapp
-A simple node.js express/mongoDB app, based on [Brad Traversy's Youtube Tutorial](https://youtu.be/gnsO8-xJ8rs).
+A simple node.js express/mySQL app, based on [Brad Traversy's Youtube Tutorial](https://youtu.be/gnsO8-xJ8rs).
 
 To try out this app run:
 ```
@@ -7,8 +7,7 @@ To try out this app run:
 > cd customerapp
 > npm install
 ```
-You'll also need to install [MongoDB](https://www.mongodb.com/download-center?jmp=nav#community]) and create a database called `customerapp`. You'll need to change the line below to match your MongoDB user, if you're using one:
-```
-var db = mongojs('app:DwarfD0rf@localhost/customerapp', ['users']);
-```
-When that's all set up just run `npm index` and point a browser at http://localhost:3000
+You'll also need to install [mySQL](https://dev.mysql.com/downloads/mysql/) then run the contents of [setupDB.sql](https://github.com/Nullh/customerapp/blob/master/setupDB.sql) as the root user to create the database objects.
+
+### IMPORTANT ###
+Change the default passwords in setupDB.sql and index.js to ones you like. There are two users, sessionUser which connctes to DB sessionStore, and test which connects to testDB. Each can have a unique password.

@@ -9,6 +9,15 @@ var mongojs = require('mongojs');
 var db = mongojs('app:DwarfD0rf@localhost/customerapp', ['users']);
 var ObjectId = mongojs.ObjectId;
 
+//mysql
+var mysql = require('mysql');
+var connection = mysql.createConnection({
+    host:       'localhost',
+    user:       'test',
+    password:   'oCj4yoE5n',
+    database:   'testdb'
+});
+
 var app = express();
 var store = new MongoDBStore(
     {
@@ -17,15 +26,19 @@ var store = new MongoDBStore(
     }
 );
 
+connection.connect(function(err){
+if(!err) {
+    console.log("Database is connected ...");    
+} else {
+    console.log("Error connecting database ...");    
+}
+});
+
 // Catch errors 
 store.on('error', function(error) {
     assert.ifError(error);
     assert.ok(false);
 });
-
-// THESE NEED TO BE STORED IN A USER SESSION
-//var errors = null;
-//var values = {first_name: null, last_name: null, email: null};
 
 // View engine
 app.set('view engine', 'pug');
@@ -77,14 +90,16 @@ app.get('/', function(req, res){
         req.session.values = {first_name: '', last_name: '', email: ''};
     }
     console.log(JSON.stringify(req.session));
-    db.users.find(function (err, users) {
+    connection.query('SELECT * FROM users;', function (err, results, fields) {
+        if(err) {console.log(err);};
+        //console.log('The solution is: ', results[0].solution);
         res.render('index', {
-        title: 'Customers',
-        users: users,
-        errors: req.session.errors,
-        values: req.session.values
+            title: 'Customers',
+            users: results,
+            errors: req.session.errors,
+            values: req.session.values
         });
-    })
+    });
 });
 
 app.post('/users/add', function(req, res){
@@ -100,18 +115,8 @@ app.post('/users/add', function(req, res){
     if(req.session.errors){
         res.redirect('/');
     } else {
-
-        var newUser = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        email: req.body.email
-        }
-    
-        db.users.insert(newUser, function(err, result){
-            if(err){
-                console.log(err);
-            }
-
+        connection.query('INSERT INTO users (first_name, last_name, email) VALUES ("'+req.body.first_name+'","'+req.body.last_name+'","'+req.body.email+'");',function(err, rows, fields){
+            if(err){console.log(err);};
             res.redirect('/');
         });
 
@@ -120,13 +125,10 @@ app.post('/users/add', function(req, res){
 });
 
 app.delete('/users/delete/:id', function(req, res){
-    //console.log(req.params.id);
-    db.users.remove({_id: ObjectId(req.params.id)}, function(err, res){
-        if(err){
-            console.log(err);
-        }
+    connection.query('DELETE FROM users WHERE _id = "'+req.params.id+'";',function(err, rows, fields){
+        if(err){console.log(err);};
+        res.redirect('/');
     });
-    res.redirect('/');
 });
 
 app.listen(3000, function(){

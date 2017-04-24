@@ -126,7 +126,7 @@ app.post('/users/add', function(req, res){
 });
 
 app.delete('/users/delete/:id', function(req, res){
-    connection.query('DELETE FROM users WHERE _id = "'+req.params.id+'";',function(err, rows, fields){
+    connection.query('DELETE FROM users WHERE id = "'+req.params.id+'";',function(err, rows, fields){
         if(err){console.log(err);};
         res.redirect('/');
     });

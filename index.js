@@ -1,13 +1,9 @@
 var express = require('express');
 var session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
 var bodyParser = require('body-parser');
 var path = require('path');
 var pug = require('pug');
 var expressValidator = require('express-validator');
-var mongojs = require('mongojs');
-var db = mongojs('app:DwarfD0rf@localhost/customerapp', ['users']);
-var ObjectId = mongojs.ObjectId;
 
 //mysql
 var mysql = require('mysql');
@@ -19,12 +15,18 @@ var connection = mysql.createConnection({
 });
 
 var app = express();
-var store = new MongoDBStore(
-    {
-        uri: 'mongodb://app:DwarfD0rf@localhost:27017/customerapp',
-        collection: 'sessionStore'
-    }
-);
+
+// Set up the session store
+var session = require('express-session');
+var sessionStore = require('express-mysql-session')(session);
+var options = {
+    host: 'localhost',
+    port: 3306,
+    user: 'sessionUser',
+    password: 'oCj4yoE5n',
+    database: 'sessionStore'
+};
+var store = new sessionStore(options);
 
 connection.connect(function(err){
 if(!err) {
@@ -45,7 +47,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // Set up session
-app.use(require('express-session')({
+app.use(session({
     secret: 'We <3 Secrets',
     cookie: {
     maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week 
@@ -55,13 +57,13 @@ app.use(require('express-session')({
     saveUninitialized: true
 }));
 
+
 // BodyParser middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
 // Set static path
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 // Express validator middleware
 app.use(expressValidator({
@@ -89,10 +91,9 @@ app.get('/', function(req, res){
     {
         req.session.values = {first_name: '', last_name: '', email: ''};
     }
-    console.log(JSON.stringify(req.session));
+    //console.log(JSON.stringify(req.session));
     connection.query('SELECT * FROM users;', function (err, results, fields) {
         if(err) {console.log(err);};
-        //console.log('The solution is: ', results[0].solution);
         res.render('index', {
             title: 'Customers',
             users: results,
